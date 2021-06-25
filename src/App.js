@@ -169,7 +169,7 @@ function NumberFact({ equation, answer }) {
     fetchNumberFact(answer).then((numberFactData) => {
       setNumberFact(numberFactData);
     });
-  }, [equation, answer]);
+  }, [answer]);
 
   if (!numberFact) {
     return <div className="NumberFact">{null}</div>;
