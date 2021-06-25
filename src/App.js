@@ -166,11 +166,7 @@ function NumberFact({ equation, answer }) {
   const [numberFact, setNumberFact] = React.useState(null);
 
   React.useEffect(() => {
-    console.log(answer);
-    console.log("added header");
     fetchNumberFact(answer).then((numberFactData) => {
-      console.log("setting fact");
-      console.log("numberfact: " + numberFactData);
       setNumberFact(numberFactData);
     });
   }, [equation, answer]);
@@ -188,8 +184,10 @@ function NumberFact({ equation, answer }) {
 }
 
 function fetchNumberFact(number) {
+  if (!number.match(/^\d+$/)) {
+    number = number.split('.')[0]
+  }
   const baseURL = "http://numbersapi.com/" + number + "?json";
-  console.log("baseURL: " + baseURL);
   return window
     .fetch(baseURL)
     .then((r) => {
