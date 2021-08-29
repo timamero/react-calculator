@@ -2,8 +2,9 @@ import React from "react";
 import "./styles.css";
 
 export default function App() {
-  const [display, setDisplay] = React.useState("0");
-  const [equation, setEquation] = React.useState("0");
+  const [display, setDisplay] = React.useState("0"); // Main display
+  const [equation, setEquation] = React.useState("0"); // Equation displayed above main display
+  
   const [answer, setAnswer] = React.useState("0");
   const [status, setStatus] = React.useState("new equation");
   const [period, setPeriod] = React.useState(false);
@@ -11,9 +12,11 @@ export default function App() {
   const numerals = /[0123456789]/;
   const numeralsOverZero = /[123456789]/;
   const mathOperators = /[-*+/]/;
+  const negativeSymbol = /(-)/;
   const lastNumberNoPeriodRegex = /[-*+/]{1}[0123456789]+$|^[0123456789]+$/;
   const firstNumberInOperandIsZeroRegex = /[-*+/]{1}[0]{1}$/;
   const firstNumberInOperandHasPeriodRegex = /[-*+/]{1}[0]{1}.$/;
+  const negativeNumber = /-{1}[0123456789]+/
 
   const handleButtonClick = (event) => {
     let buttonValue = event.target.value;
@@ -144,6 +147,7 @@ function NumberPad({ handleButtonClick }) {
       <InputButton value="." handleButtonClick={handleButtonClick} />
       <InputButton value="=" handleButtonClick={handleButtonClick} />
       <InputButton value="+" handleButtonClick={handleButtonClick} />
+      <InputButton value="(-)" handleButtonClick={handleButtonClick} />
       <InputButton value="C" handleButtonClick={handleButtonClick} />
       <InputButton value="<" handleButtonClick={handleButtonClick} />
     </div>
@@ -184,6 +188,10 @@ function NumberFact({ equation, answer }) {
 }
 
 function fetchNumberFact(number) {
+  if (number === 'Infinity') {
+    number = Math.floor(Math.random() * 100).toString()
+  }
+
   if (!number.match(/^\d+$/)) {
     number = number.split('.')[0]
   }
