@@ -1,4 +1,5 @@
 import React from "react";
+import calculateEquation from "./calc_helper";
 import "./styles.css";
 
 export default function App() {
@@ -12,11 +13,10 @@ export default function App() {
   const numerals = /[0123456789]/;
   const numeralsOverZero = /[123456789]/;
   const mathOperators = /[-*+/]/;
-  const negativeSymbol = /(-)/;
+  const negativeSymbol = /\(-\)/;
   const lastNumberNoPeriodRegex = /[-*+/]{1}[0123456789]+$|^[0123456789]+$/;
   const firstNumberInOperandIsZeroRegex = /[-*+/]{1}[0]{1}$/;
   const firstNumberInOperandHasPeriodRegex = /[-*+/]{1}[0]{1}.$/;
-  const negativeNumber = /-{1}[0123456789]+/
 
   const handleButtonClick = (event) => {
     let buttonValue = event.target.value;
@@ -57,14 +57,17 @@ export default function App() {
           setDisplay(buttonValue);
           setStatus("operand");
           setPeriod(false);
-        } else if (buttonValue.match(mathOperators)) {
+        } else if (buttonValue.match(mathOperators) && !buttonValue.match(negativeSymbol)) {
           setDisplay(display + buttonValue);
           setStatus("operator");
         } else if (buttonValue === ".") {
           setDisplay(display + buttonValue);
           setPeriod(true);
           setStatus("operand");
-        }
+        } else if (buttonValue.match(negativeSymbol)) {
+          setDisplay(buttonValue)
+          setStatus("operand")
+        } 
         break;
       case "operand":
         if (buttonValue.match(numerals)) {
@@ -75,24 +78,24 @@ export default function App() {
           } else {
             setDisplay(display + buttonValue);
           }
-        } else if (buttonValue.match(mathOperators)) {
+        } else if (buttonValue.match(mathOperators) && !buttonValue.match(negativeSymbol)) {
           setDisplay(display + buttonValue);
           setStatus("operator");
         } else if (buttonValue === "=") {
           setEquation(display);
-          setDisplay(eval(display).toString());
+          setDisplay(calculateEquation(display).toString());
           setStatus("new equation");
-          setAnswer(eval(display).toString());
+          setAnswer(calculateEquation(display).toString());
         } else if (
           buttonValue === "." &&
           display.match(lastNumberNoPeriodRegex)
         ) {
           setDisplay(display + buttonValue);
           setPeriod(true);
-        }
+        } 
         break;
       case "operator":
-        if (buttonValue.match(mathOperators)) {
+        if (buttonValue.match(mathOperators) && !buttonValue.match(negativeSymbol)) {
           setDisplay(display.slice(0, -1) + buttonValue);
         } else if (buttonValue.match(numerals)) {
           setDisplay(display + buttonValue);
@@ -100,7 +103,11 @@ export default function App() {
           setPeriod(false);
         } else if (buttonValue === ".") {
           setDisplay(display + "0" + buttonValue);
+          setStatus("operand");
           setPeriod(true);
+        } else if (buttonValue.match(negativeSymbol)) {
+          setDisplay(display + buttonValue);
+          setStatus("operand");
         }
         break;
       default:
@@ -188,7 +195,7 @@ function NumberFact({ equation, answer }) {
 }
 
 function fetchNumberFact(number) {
-  if (number === 'Infinity') {
+  if (number === 'Infinity' || number === '-Infinity') {
     number = Math.floor(Math.random() * 100).toString()
   }
 
